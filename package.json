@@ -1,0 +1,12 @@
+{
+  "type": "module",
+  "scripts": {
+    "db:create": "node scripts/create_db.js"
+  },
+  "dependencies": {
+    "libsql": "^0.3.19"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.1"
+  }
+}
