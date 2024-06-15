@@ -1,8 +1,7 @@
-import Database from 'libsql';
+import { db } from '../sqlite.js';
 import { faker } from '@faker-js/faker';
 
-const NUMBER_OF_USERS = 500;
-const db = new Database('users.db', { readonly: false });
+const NUMBER_OF_USERS = 1000;
 
 // create `user` table
 db.exec(`
@@ -17,6 +16,7 @@ db.exec(`
   );
 `);
 
+// generate users with fake data
 const users = [];
 for (let i = 0; i < NUMBER_OF_USERS; i++) {
   users.push({
@@ -26,15 +26,17 @@ for (let i = 0; i < NUMBER_OF_USERS; i++) {
     email: faker.internet.email(),
     title: faker.person.jobTitle(),
     description: faker.person.jobDescriptor(),
-    profile: faker.lorem.sentences()
+    profile: faker.word.words({ count: { min: 5, max: 20 } })
   });
 }
 
+// define insert statement
 const insert = db.prepare(`
   insert into user (firstname, lastname, age, email, title, description, profile)
   values (:firstname, :lastname, :age, :email, :title, :description, :profile)
 `);
 
+// build an insert transaction and insert all users
 const insertTransaction = db.transaction((xs) => {
   for (const x of xs) insert.run(x);
 });
