@@ -1,9 +1,10 @@
-import { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLList } from 'graphql';
-import { db } from './sqlite.js';
+import { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql';
+import { db, sql } from './sqlite.js';
 
 const UserType = new GraphQLObjectType({
   name: 'User',
   fields: {
+    rowid: { type: GraphQLInt },
     firstname: { type: GraphQLString },
     lastname: { type: GraphQLString },
     age: { type: GraphQLInt },
@@ -16,21 +17,55 @@ const UserType = new GraphQLObjectType({
 
 const QueryType = new GraphQLObjectType({
   name: 'Query',
-  args: UserType.getFields(),
   fields: {
     users: {
       type: new GraphQLList(UserType),
-      resolve: (source, args, context, info) => {
-        console.log({args});
-        // console.log({source, args, context, info});
-        // console.log(info.fieldNodes);
-        const select = db.prepare('select * from user');
-        const rows = select.all();
-        console.log(rows);
-        return rows;
+      args: UserType.getFields(),
+      resolve(_source, args) {
+        const query = sql('select rowid, * from user')
+          .where(args)
+          .build();
+
+        const select = db.prepare(query);
+        return select.all(args);
       }
     }
   }
 });
 
-export const schema = new GraphQLSchema({ query: QueryType });
+const MutationType = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    updateUser: {
+      type: UserType,
+      args: {
+        ...UserType.getFields(),
+        rowid: { type: new GraphQLNonNull(GraphQLInt) }
+      },
+      resolve(_source, args) {
+        const rowid = args.rowid;
+        delete args.rowid;
+
+        const query = sql('update user')
+          .update(args)
+          .where({ rowid })
+          .build()
+
+        const update = db.prepare(query);
+        update.run({ ...args, rowid });
+
+        const selectQuery = sql('select rowid, * from user')
+          .where({ rowid })
+          .build();
+
+        const select = db.prepare(selectQuery);
+        return select.get({ rowid });
+      }
+    }
+  }
+});
+
+export const schema = new GraphQLSchema({
+  query: QueryType,
+  mutation: MutationType
+});

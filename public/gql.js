@@ -1,21 +1,5 @@
 const API = '/gql';
 
-// // Prepare simple query
-// const query = `
-//   query Query($name: String!) {
-//     pokemon(name: $name) {
-//       number
-//       name
-//       attacks {
-//         special {
-//           name
-//           type
-//         }
-//       }
-//     }
-//   }
-// `;
-
 export async function gql(query = '', variables = {}) {
   if (!query.trim()) {
     throw Error('Error: Empty query provided');
@@ -28,7 +12,6 @@ export async function gql(query = '', variables = {}) {
     body: JSON.stringify(body)
   });
 
-  const text = await res.text();
-  console.log(text);
-  return text;
+  const json = await res.json();
+  return json;
 }

@@ -1,0 +1,49 @@
+meta {
+  name: mutation-with-variables
+  type: graphql
+  seq: 4
+}
+
+post {
+  url: http://localhost:8080/gql
+  body: graphql
+  auth: none
+}
+
+body:graphql {
+  mutation UpdateUserInfo(
+    $rowid: Int!
+    $firstname: String
+    $lastname: String
+    $email: String
+    $title: String
+    $description: String
+    $profile: String
+  ) {
+    updateUser(
+      rowid: $rowid
+      firstname: $firstname
+      lastname: $lastname
+      email: $email
+      title: $title
+      description: $description
+      profile: $profile
+    ) {
+      firstname
+      lastname
+      age
+      email
+      title
+      description
+      profile
+    }
+  }
+  
+}
+
+body:graphql:vars {
+  {
+    "rowid": 5,
+    "firstname": "PotatoHead"
+  }
+}

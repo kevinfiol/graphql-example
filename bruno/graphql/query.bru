@@ -1,0 +1,22 @@
+meta {
+  name: query
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/gql
+  body: graphql
+  auth: none
+}
+
+body:graphql {
+  query UserInfo {
+    users(rowid: 5) {
+      rowid
+      firstname
+      email
+    }
+  }
+  
+}

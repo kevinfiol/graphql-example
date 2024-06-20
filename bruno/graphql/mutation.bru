@@ -1,0 +1,26 @@
+meta {
+  name: mutation
+  type: graphql
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/gql
+  body: graphql
+  auth: none
+}
+
+body:graphql {
+  mutation UpdateUserForTable {
+    updateUser(rowid: 5, firstname: "Justin") {
+      firstname
+      lastname
+      age
+      email
+      title
+      description
+      profile
+    }
+  }
+  
+}

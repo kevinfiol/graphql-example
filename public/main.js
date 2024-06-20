@@ -1,21 +1,30 @@
-// import { render } from 'preact';
-// import { html } from 'htm/preact';
+import { h, render, hydrate } from 'preact';
+import { useEffect } from 'preact/hooks';
+import { html } from 'htm/preact';
+import navaid from 'navaid';
+import { TablePage } from './TablePage.js';
+import { UserPage } from './UserPage.js';
 
-// function App() {
-//   return html`
-//     <p>hello world</p>
-//   `;
-// }
+let $page;
 
-// render(html`<${App}/>`, document.querySelector('main'));
+const setPage = (component, props = {}) => {
+  hydrate(h(component, props), $page);
+};
 
-import { gql } from './gql.js';
+export const router = navaid('/')
+  .on('/', () => {
+    setPage(TablePage);
+  })
+  .on('/user/:rowid', (props) => {
+    setPage(UserPage, props);
+  });
 
-gql(`
-  query UserInfo {
-    users(firstname: Tomas) {
-      firstname
-      email
-    }
-  }
-`);
+function App() {
+  useEffect(router.listen, []);
+
+  return html`
+    <div ref=${(el) => ($page = el)} />
+  `
+}
+
+render(html`<${App}/>`, document.querySelector('main'));
