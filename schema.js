@@ -1,6 +1,20 @@
 import { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql';
 import { db, sql } from './sqlite.js';
 
+/**
+Schema Equivalent:
+  type User {
+    rowid: Int
+    firstname: String
+    lastname: String
+    age: Int
+    email: String
+    title: String
+    description: String
+    profile: String
+  }
+**/
+
 const UserType = new GraphQLObjectType({
   name: 'User',
   fields: {
@@ -15,6 +29,12 @@ const UserType = new GraphQLObjectType({
   }
 });
 
+/**
+Schema Equivalent:
+  type Query {
+    users: [User]
+  }
+**/
 const QueryType = new GraphQLObjectType({
   name: 'Query',
   fields: {
